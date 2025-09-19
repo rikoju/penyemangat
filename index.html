@@ -428,31 +428,35 @@
             display: inline-block
         }
 
-        /* Confetti pink spesial (kejutan saat foto muncul) */
-        .confetti-pink {
+        /* Tirai hati pink menutup 1 foto lalu jatuh semua */
+        .pink-curtain {
             position: fixed;
+            /* nempel ke posisi foto di viewport */
             pointer-events: none;
             z-index: 10000;
-            opacity: 0;
-            will-change: transform, opacity;
-            animation: pinkBurst 1100ms ease-out forwards;
-            /* default warna jika pakai karakter hati biasa */
-            color: #ff6bb5;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .15));
         }
 
-        @keyframes pinkBurst {
+        .pink-heart-tile {
+            position: absolute;
+            line-height: 1;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .15));
+            animation: tileFall 1100ms ease-in forwards;
+            /* warna emoji sudah pink (💗/💕), CSS color tidak perlu */
+        }
+
+        @keyframes tileFall {
             0% {
-                transform: translate(0, 0) scale(.6) rotate(0deg);
-                opacity: 0;
+                transform: translate(0, 0) scale(.9) rotate(0deg);
+                opacity: 1;
             }
 
-            20% {
+            80% {
                 opacity: 1;
             }
 
             100% {
-                transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(360deg);
+                transform: translate(var(--fx), var(--fy)) scale(1.1) rotate(var(--rot));
                 opacity: 0;
             }
         }
@@ -818,42 +822,67 @@
                 for (let i = 0; i < n; i++) setTimeout(spawnHeart, i * 60);
             }
 
-            /* Confetti pink kejutan di sekitar foto */
+            /* Tirai hati pink: penuh menutup foto, lalu berguguran semua */
             function celebrateReveal() {
                 const target = document.getElementById('photoReveal');
                 if (!target) return;
 
+                // Gunakan ukuran foto/container saat sudah tampil
                 const rect = target.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
 
-                const N = 80; // jumlah partikel
-                for (let i = 0; i < N; i++) {
-                    const s = document.createElement('span');
-                    s.className = 'confetti-pink';
-                    // pakai emoji hati pink agar beda dengan confetti bawaan
-                    s.textContent = Math.random() < 0.5 ? '💗' : '💕';
+                // Buat overlay tepat di atas area foto (posisi relatif ke viewport saat ini)
+                const overlay = document.createElement('div');
+                overlay.className = 'pink-curtain';
+                overlay.style.left = rect.left + 'px';
+                overlay.style.top = rect.top + 'px';
+                overlay.style.width = rect.width + 'px';
+                overlay.style.height = rect.height + 'px';
 
-                    // posisikan dari tengah foto
-                    s.style.left = cx + 'px';
-                    s.style.top = cy + 'px';
+                // Ukuran "ubin" hati (px)
+                const TILE = 30; // boleh diubah 26–36 kalau mau lebih rapat/longgar
+                const cols = Math.ceil(rect.width / TILE);
+                const rows = Math.ceil(rect.height / TILE);
 
-                    // arah & jarak acak
-                    const ang = Math.random() * Math.PI * 2;
-                    const dist = 60 + Math.random() * 160; // px
-                    const dx = Math.cos(ang) * dist;
-                    const dy = Math.sin(ang) * dist;
+                // Estimasi durasi animasi terlama (buat jadwal hapus overlay)
+                let maxDelay = 0;
 
-                    // ukuran acak
-                    s.style.fontSize = (14 + Math.random() * 20) + 'px';
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const span = document.createElement('span');
+                        span.className = 'pink-heart-tile';
+                        span.textContent = Math.random() < 0.5 ? '💗' : '💕';
 
-                    // set vektor gerak
-                    s.style.setProperty('--dx', dx + 'px');
-                    s.style.setProperty('--dy', dy + 'px');
+                        // Posisi ubin (dengan sedikit jitter supaya alami)
+                        const jitterX = (Math.random() * 0.3 - 0.15) * TILE;
+                        const jitterY = (Math.random() * 0.3 - 0.15) * TILE;
+                        span.style.left = (c * TILE + jitterX) + 'px';
+                        span.style.top = (r * TILE + jitterY) + 'px';
 
-                    document.body.appendChild(s);
-                    setTimeout(() => s.remove(), 1200);
+                        // Ukuran font relatif ke TILE
+                        span.style.fontSize = (TILE * (0.9 + Math.random() * 0.4)) + 'px';
+
+                        // Vektor jatuh dan rotasi acak
+                        const driftX = (Math.random() * 120 - 60);             // kiri/kanan
+                        const fallY = rect.height * (0.6 + Math.random() * 0.8) + 80;
+                        const rot = (Math.random() * 360 - 180);            // -180° s/d 180°
+                        span.style.setProperty('--fx', driftX + 'px');
+                        span.style.setProperty('--fy', fallY + 'px');
+                        span.style.setProperty('--rot', rot + 'deg');
+
+                        // Delay: dibuat sedikit berjenjang per-baris (atas duluan)
+                        const delay = r * 50 + Math.random() * 180;              // ms
+                        span.style.animationDelay = delay + 'ms';
+                        if (delay > maxDelay) maxDelay = delay;
+
+                        overlay.appendChild(span);
+                    }
                 }
+
+                document.body.appendChild(overlay);
+
+                // Hapus overlay setelah semua animasi selesai
+                const ANIM = 1100; // durasi @keyframes
+                setTimeout(() => overlay.remove(), maxDelay + ANIM + 120);
             }
 
             /* ===== TWO-THUMB GATE (screen6) ===== */
