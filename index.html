@@ -1,465 +1,777 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Untuk Sayangku ❤️</title>
-  <style>
-    :root{
-      --bg1:#ff9a9e; --bg2:#fad0c4; --white:#fff; --heart:#ff4d4d; --glass:rgba(255,255,255,.25);
-      --shadow:rgba(0,0,0,.25); --ease-io:cubic-bezier(.4,0,.2,1); --maxw:760px;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%}
-    body{
-      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-      background:linear-gradient(to bottom,var(--bg1),var(--bg2));
-      color:var(--white);
-      overflow:hidden; /* dibuka saat flow dimulai */
-    }
-    h1{font-size:clamp(1.8rem,4.8vw,3rem);text-align:center;margin-bottom:.75rem;text-shadow:2px 2px 8px var(--shadow)}
-    p{font-size:clamp(1rem,3.6vw,1.15rem);line-height:1.55;text-align:center}
-    .heart{color:var(--heart);animation:beat 1.5s infinite}
-    @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Untuk Sayangku ❤️</title>
+    <style>
+        :root {
+            --bg1: #ff9a9e;
+            --bg2: #fad0c4;
+            --white: #fff;
+            --heart: #ff4d4d;
+            --glass: rgba(255, 255, 255, .25);
+            --shadow: rgba(0, 0, 0, .25);
+            --ease-io: cubic-bezier(.4, 0, .2, 1);
+            --maxw: 760px;
+        }
 
-    /* ====== Layar 1–4 overlay; 5 flow; 6 exam ====== */
-    .stack{position:relative;min-height:100svh}
-    .screen{
-      position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
-      padding:min(6vw,28px);opacity:0;transform:translateY(24px) scale(.98);pointer-events:none;
-      transition:opacity .7s var(--ease-io),transform .7s var(--ease-io),filter .7s var(--ease-io);
-      filter:saturate(.9) blur(.4px);
-    }
-    .screen.active{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;z-index:10;filter:none}
-    .instruction{position:absolute;left:0;right:0;bottom:24px;opacity:.85;font-style:italic}
-    .screen.flow{position:relative;inset:auto;min-height:100svh}
-    .screen.exam{position:relative;inset:auto;min-height:100svh;display:none}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent
+        }
 
-    /* Movie words */
-    #word-container{position:relative;min-height:36vh;display:flex;align-items:center;justify-content:center}
-    .word-animation{
-      position:absolute;font-weight:800;font-size:clamp(1.2rem,5.5vw,2.25rem);
-      text-shadow:0 0 14px rgba(255,255,255,.6);opacity:0;animation:zoomInOut 2.8s var(--ease-io) forwards;text-align: center;
-  width: 100%;
-    }
-    @keyframes zoomInOut{
-      0%{transform:scale(.8) rotate(-8deg);opacity:0}
-      18%{transform:scale(1.12) rotate(0);opacity:1}
-      82%{transform:scale(1.12);opacity:1}
-      100%{transform:scale(.92) rotate(5deg);opacity:0}
-    }
+        html,
+        body {
+            height: 100%
+        }
 
-    /* Tap */
-    .tap-area{
-      width:min(240px,55vw);height:min(240px,55vw);border-radius:50%;
-      background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin:18px 0;
-      box-shadow:0 8px 24px rgba(0,0,0,.18) inset,0 2px 8px rgba(0,0,0,.08);transition:transform .15s;
-    }
-    .tap-counter{font-size:clamp(2rem,10vw,3.2rem);font-weight:800}
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            background: linear-gradient(to bottom, var(--bg1), var(--bg2));
+            color: var(--white);
+            overflow: hidden;
+            /* dibuka saat flow dimulai */
+        }
 
-    /* Swipe */
-    .swipe-area{height:180px;display:flex;align-items:center;justify-content:center}
-    .swipe-hand{font-size:clamp(2rem,10vw,3rem);animation:swipeMove 2s infinite var(--ease-io)}
-    @keyframes swipeMove{0%{transform:translateX(-80px)}50%{transform:translateX(80px)}100%{transform:translateX(-80px)}}
+        h1 {
+            font-size: clamp(1.8rem, 4.8vw, 3rem);
+            text-align: center;
+            margin-bottom: .75rem;
+            text-shadow: 2px 2px 8px var(--shadow)
+        }
 
-    /* Rotate text only */
-    .rotated{display:inline-block;transform:rotate(180deg);font-family:"Courier New",Consolas,monospace;letter-spacing:.6px;user-select:none}
+        p {
+            font-size: clamp(1rem, 3.6vw, 1.15rem);
+            line-height: 1.55;
+            text-align: center
+        }
 
-    /* Heart confetti stream (bawaan) */
-    .confetti-heart{
-      position:fixed;pointer-events:none;opacity:.9;z-index:9999;
-      filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));animation:fall linear forwards;
-    }
-    @keyframes fall{
-      0%{transform:translateY(-10vh) translateX(var(--sx)) rotate(0deg);opacity:0}
-      10%{opacity:1}
-      100%{transform:translateY(110vh) translateX(var(--ex)) rotate(360deg);opacity:0}
-    }
+        .heart {
+            color: var(--heart);
+            animation: beat 1.5s infinite
+        }
 
-    /* Progress bar (opsional, elemen tidak wajib ada) */
-    #progress{position:fixed;top:0;left:0;height:4px;width:0;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);z-index:99999;transition:width .1s linear}
+        @keyframes beat {
 
-    /* Scroll Stage */
-    main.scroll-stage{display:none}
-    main.scroll-stage.ready{display:block}
-    #longScroll{width:100%;max-width:var(--maxw);margin:0 auto;padding:6px 12px}
-    #longScroll br{line-height:28px}
+            0%,
+            100% {
+                transform: scale(1)
+            }
 
-    /* Next gate (balloon heart) */
-    .next-gate{max-width:var(--maxw);margin:24px auto 40px;padding:24px 16px;text-align:center}
-    .balloon-wrap{position:relative;height:42vh;display:flex;align-items:center;justify-content:center}
-    .balloon{
-      width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.9);
-      display:flex;align-items:center;justify-content:center;transition:transform .08s linear,background .2s var(--ease-io),border-color .2s var(--ease-io);will-change:transform;
-    }
-    .balloon span{font-size:34px;transform:translateY(1px)}
-    .balloon.pop{animation:pop .5s ease forwards}
-    @keyframes pop{0%{transform:scale(1)}60%{transform:scale(1.25)}100%{transform:scale(0);opacity:0}}
+            50% {
+                transform: scale(1.25)
+            }
+        }
 
-    /* EXAM */
-    .exam-wrap{max-width:var(--maxw);margin:0 auto;padding:24px 18px 120px;text-align:center}
-    .thumb-gate{
-      position:sticky;bottom:10px;display:flex;gap:16px;justify-content:center;align-items:center;z-index:50;padding:8px;backdrop-filter:blur(6px)
-    }
-    .heart-btn{
-      flex:1;min-width:42%;padding:14px;border-radius:18px;user-select:none;touch-action:none;background:rgba(255,255,255,.12);
-      border:2px dashed rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;transition:transform .1s;
-    }
-    .heart-btn:active{transform:scale(.98)}
-    .icon-heart{width:44px;height:44px}
-    .icon-heart .stroke{stroke:#fff;stroke-width:2.5;fill:none;opacity:.95}
-    .icon-heart .fill{fill:#ff4d4d;opacity:0;transition:opacity .12s}
-    .heart-btn.active .fill{opacity:1}
-    .heart-btn.active .stroke{opacity:.25}
+        /* ====== Layar 1–4 overlay; 5 flow; 6 exam ====== */
+        .stack {
+            position: relative;
+            min-height: 100svh
+        }
 
-    .photo-reveal{margin:22px auto 80px;max-width:680px;display:none}
-    .photo-reveal img{
-      width:100%;height:auto;border-radius:24px;border:8px solid #fff;
-      box-shadow:0 14px 48px rgba(0,0,0,.35),0 0 0 2px rgba(255,255,255,.35) inset;
-    }
-    .note{
-      margin-top:10px;font-weight:700;font-size:1.1rem;background:rgba(255,255,255,.2);
-      border:1px solid rgba(255,255,255,.55);padding:10px 14px;border-radius:999px;display:inline-block
-    }
-  </style>
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: min(6vw, 28px);
+            opacity: 0;
+            transform: translateY(24px) scale(.98);
+            pointer-events: none;
+            transition: opacity .7s var(--ease-io), transform .7s var(--ease-io), filter .7s var(--ease-io);
+            filter: saturate(.9) blur(.4px);
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            z-index: 10;
+            filter: none
+        }
+
+        .instruction {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 24px;
+            opacity: .85;
+            font-style: italic
+        }
+
+        .screen.flow {
+            position: relative;
+            inset: auto;
+            min-height: 100svh
+        }
+
+        .screen.exam {
+            position: relative;
+            inset: auto;
+            min-height: 100svh;
+            display: none
+        }
+
+        /* Movie words */
+        #word-container {
+            position: relative;
+            min-height: 36vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .word-animation {
+            position: absolute;
+            font-weight: 800;
+            font-size: clamp(1.2rem, 5.5vw, 2.25rem);
+            text-shadow: 0 0 14px rgba(255, 255, 255, .6);
+            opacity: 0;
+            animation: zoomInOut 2.8s var(--ease-io) forwards;
+            text-align: center;
+            width: 100%;
+        }
+
+        @keyframes zoomInOut {
+            0% {
+                transform: scale(.8) rotate(-8deg);
+                opacity: 0
+            }
+
+            18% {
+                transform: scale(1.12) rotate(0);
+                opacity: 1
+            }
+
+            82% {
+                transform: scale(1.12);
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(.92) rotate(5deg);
+                opacity: 0
+            }
+        }
+
+        /* Tap */
+        .tap-area {
+            width: min(240px, 55vw);
+            height: min(240px, 55vw);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 18px 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .18) inset, 0 2px 8px rgba(0, 0, 0, .08);
+            transition: transform .15s;
+        }
+
+        .tap-counter {
+            font-size: clamp(2rem, 10vw, 3.2rem);
+            font-weight: 800
+        }
+
+        /* Swipe */
+        .swipe-area {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .swipe-hand {
+            font-size: clamp(2rem, 10vw, 3rem);
+            animation: swipeMove 2s infinite var(--ease-io)
+        }
+
+        @keyframes swipeMove {
+            0% {
+                transform: translateX(-80px)
+            }
+
+            50% {
+                transform: translateX(80px)
+            }
+
+            100% {
+                transform: translateX(-80px)
+            }
+        }
+
+        /* Rotate text only */
+        .rotated {
+            display: inline-block;
+            transform: rotate(180deg);
+            font-family: "Courier New", Consolas, monospace;
+            letter-spacing: .6px;
+            user-select: none
+        }
+
+        /* Heart confetti stream (bawaan) */
+        .confetti-heart {
+            position: fixed;
+            pointer-events: none;
+            opacity: .9;
+            z-index: 9999;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .18));
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(var(--sx)) rotate(0deg);
+                opacity: 0
+            }
+
+            10% {
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(110vh) translateX(var(--ex)) rotate(360deg);
+                opacity: 0
+            }
+        }
+
+        /* Progress bar (opsional, elemen tidak wajib ada) */
+        #progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            width: 0;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 255, 255, .9);
+            z-index: 99999;
+            transition: width .1s linear
+        }
+
+        /* Scroll Stage */
+        main.scroll-stage {
+            display: none
+        }
+
+        main.scroll-stage.ready {
+            display: block
+        }
+
+        #longScroll {
+            width: 100%;
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 6px 12px
+        }
+
+        #longScroll br {
+            line-height: 28px
+        }
+
+        /* Next gate (balloon heart) */
+        .next-gate {
+            max-width: var(--maxw);
+            margin: 24px auto 40px;
+            padding: 24px 16px;
+            text-align: center
+        }
+
+        .balloon-wrap {
+            position: relative;
+            height: 42vh;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .balloon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .15);
+            border: 2px solid rgba(255, 255, 255, .9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .08s linear, background .2s var(--ease-io), border-color .2s var(--ease-io);
+            will-change: transform;
+        }
+
+        .balloon span {
+            font-size: 34px;
+            transform: translateY(1px)
+        }
+
+        .balloon.pop {
+            animation: pop .5s ease forwards
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(1)
+            }
+
+            60% {
+                transform: scale(1.25)
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0
+            }
+        }
+
+        /* EXAM */
+        .exam-wrap {
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 24px 18px 120px;
+            text-align: center
+        }
+
+        .thumb-gate {
+            position: sticky;
+            bottom: 10px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            padding: 8px;
+            backdrop-filter: blur(6px)
+        }
+
+        .heart-btn {
+            flex: 1;
+            min-width: 42%;
+            padding: 14px;
+            border-radius: 18px;
+            user-select: none;
+            touch-action: none;
+            background: rgba(255, 255, 255, .12);
+            border: 2px dashed rgba(255, 255, 255, .85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .1s;
+        }
+
+        .heart-btn:active {
+            transform: scale(.98)
+        }
+
+        .icon-heart {
+            width: 44px;
+            height: 44px
+        }
+
+        .icon-heart .stroke {
+            stroke: #fff;
+            stroke-width: 2.5;
+            fill: none;
+            opacity: .95
+        }
+
+        .icon-heart .fill {
+            fill: #ff4d4d;
+            opacity: 0;
+            transition: opacity .12s
+        }
+
+        .heart-btn.active .fill {
+            opacity: 1
+        }
+
+        .heart-btn.active .stroke {
+            opacity: .25
+        }
+
+        .photo-reveal {
+            margin: 22px auto 80px;
+            max-width: 680px;
+            display: none
+        }
+
+        .photo-reveal img {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            border: 8px solid #fff;
+            box-shadow: 0 14px 48px rgba(0, 0, 0, .35), 0 0 0 2px rgba(255, 255, 255, .35) inset;
+        }
+
+        .note {
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, .2);
+            border: 1px solid rgba(255, 255, 255, .55);
+            padding: 10px 14px;
+            border-radius: 999px;
+            display: inline-block
+        }
+    </style>
 </head>
+
 <body>
 
-  <!-- ====== Overlay screens (1–4 absolute), 5 flow, 6 exam (hidden) ====== -->
-  <div class="stack" id="stack">
-    <!-- 1 -->
-    <section class="screen active" id="screen1" aria-label="Pembuka">
-      <h1>baut neng sayangggg ku🥰🥰🥰 <span class="heart">❤️</span></h1>
-      <p>Usap ke <b>kiri</b> buat mulai ya sayangggg🤔🥰🥰</p>
-      <p class="instruction">bacaa sampe selesai yah sayangggg🥰🥰</p>
-    </section>
+    <!-- ====== Overlay screens (1–4 absolute), 5 flow, 6 exam (hidden) ====== -->
+    <div class="stack" id="stack">
+        <!-- 1 -->
+        <section class="screen active" id="screen1" aria-label="Pembuka">
+            <h1>baut neng sayangggg ku🥰🥰🥰 <span class="heart">❤️</span></h1>
+            <p>Usap ke <b>kiri</b> buat mulai ya sayangggg🤔🥰🥰</p>
+            <p class="instruction">bacaa sampe selesai yah sayangggg🥰🥰</p>
+        </section>
 
-    <!-- 2 -->
-    <section class="screen" id="screen2" aria-label="Kata-kata">
-      <div id="word-container" aria-live="polite"></div>
-      <p class="instruction">Baca sampe selesai yah sayangggg🥰🥰</p>
-    </section>
+        <!-- 2 -->
+        <section class="screen" id="screen2" aria-label="Kata-kata">
+            <div id="word-container" aria-live="polite"></div>
+            <p class="instruction">Baca sampe selesai yah sayangggg🥰🥰</p>
+        </section>
 
-    <!-- 3 -->
-    <section class="screen" id="screen3" aria-label="Tap">
-      <h1>Tap lingkaran ini 20x!</h1>
-      <div class="tap-area" id="tap-area">
-        <div class="tap-counter" id="tap-counter">0</div>
-      </div>
-      <p>Semangat terus sayangggg🥰🥰</p>
-    </section>
+        <!-- 3 -->
+        <section class="screen" id="screen3" aria-label="Tap">
+            <h1>Tap lingkaran ini 20x!</h1>
+            <div class="tap-area" id="tap-area">
+                <div class="tap-counter" id="tap-counter">0</div>
+            </div>
+            <p>Semangat terus sayangggg🥰🥰</p>
+        </section>
 
-    <!-- 4 -->
-    <section class="screen" id="screen4" aria-label="Swipe">
-      <h1>Usap ke kanan ya</h1>
-      <div class="swipe-area"><div class="swipe-hand">👆</div></div>
-      <p>Geser ke <b>kanan</b> untuk ke tahap berikutnya</p>
-    </section>
+        <!-- 4 -->
+        <section class="screen" id="screen4" aria-label="Swipe">
+            <h1>Usap ke kanan ya</h1>
+            <div class="swipe-area">
+                <div class="swipe-hand">👆</div>
+            </div>
+            <p>Geser ke <b>kanan</b> untuk ke tahap berikutnya</p>
+        </section>
 
-    <!-- 5 (FLOW) -->
-    <section class="screen flow" id="screen5" aria-label="Rotate">
-      <h1>Coba baca ini…</h1>
-      <p style="margin-top:14px">
-        <span class="rotated">sayanggg🥰🥰 sayanggg gimana kabarnya sayangggg🤔🥰🥰<br> aa harap baik selalu yah
-          sayangggg🥰🥰<br> aa tau bangettt gimana neng🥰🥰 <br>neng tuh kuat🥰🥰 neng tuh hebat🥰🥰 aa sama
-          sekali ngga pernah nganggep neng lemah kok sayangggg🥰🥰 <br> tapi kayaknya sekarng neng lagi cape
-          yah sayangggg🤔🥰🥰 ngga papa kok sayangggg🥰🥰 ngga harus selalu kuat terus🥰🥰 sesekali
-          istirahat🥰 sesekali egois ngga papa kok sayangggg🥰🥰<br>neng boleh jadi kuat dimanapun
-          sayangggg🥰🥰 tapiiii jangan ragu buat ekpresiin diri neng ke aa yah sayangggg🥰🥰 <br><br><br>AA
-          sayanggg bangettt sama neng🥰🥰🥰 jujur aa khawatir sama neng sayangggg🥰🥰 <br> aa pengen banget
-          bisa berguna😭😭 aa pengen bangettt ngehibur neng😟😟 tapi aa bingunggg gimana caranya😭😭 <br>
-          intinya kalo ada apa apa kasih tau yahhh sayangggg🥰🥰 <br>aa berharap bangettt neng cerita sama aa
-          sayangggg🥰🥰</span>
-      </p>
-      <br><br><br>
-      <p class="instruction">Sudah kebaca? Sekarang <b>scroll terus ke bawah</b> ya ↓↓↓</p>
-    </section>
-  </div>
-
-  <!-- ====== Scroll Stage: BR-only long path + Next gate ====== -->
-  <main class="scroll-stage" id="scrollStage" aria-label="Perjalanan Scroll">
-    <br>scroll kebawah
-    sayanggg🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>terus
-    sayanggg🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>semangatttt🥰🥰<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>sedikit
-    lagi
-    ayokkkk🤣🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>semangat
-    sayanggg
-    semangatttt🥰🥰<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-    <section class="next-gate" id="nextGate" style="display:none">
-      <h1>Terakhir, pecahin hati ini untuk lanjut ke berikut nya yahhh sayangggg🤔🥰💥</h1>
-      <p>Tap tap yang cepet sayanggg sampai “POP!” — kalau pelan dia mengecil lagi 🙊🤣🤣</p>
-      <div class="balloon-wrap"><div class="balloon" id="balloon"><span>❤️</span></div></div>
-      <p class="instruction">Kalau berhasil pecah bakal lanjut ke bagian akhir🥰🥰</p>
-    </section>
-  </main>
-
-  <!-- ====== Screen 6: Ujian Kecil ====== -->
-  <section class="screen exam" id="screen6" aria-label="Ujian Kecil">
-    <div class="exam-wrap">
-      <h1>Kejutan buat neng🥰🥰</h1>
-      <p>Tekan <b>kedua hati</b> ini bersamaan selama ±1.5 detik. Kalau salah satu lepas <i>nggak akan muncul</i> 😝</p>
-
-      <div class="thumb-gate">
-        <button class="heart-btn" id="leftThumb" aria-label="Jempol kiri">
-          <svg class="icon-heart" viewBox="0 0 24 24" fill="none">
-            <path class="fill" d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z"/>
-            <path class="stroke" d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z"/>
-          </svg>
-        </button>
-        <button class="heart-btn" id="rightThumb" aria-label="Jempol kanan">
-          <svg class="icon-heart" viewBox="0 0 24 24" fill="none">
-            <path class="fill" d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z"/>
-            <path class="stroke" d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="photo-reveal" id="photoReveal">
-        <img src="photo/IMG-20250727-WA0003.jpg" alt="Foto kita berdua" />
-        <div class="note">Cium dulu dong aa nya sayanggg😘🤣🤣</div>
-      </div>
-      <p class="instruction">Kalau udah muncul berarti udah selesai sayangggg🤔🥰🥰</p>
+        <!-- 5 (FLOW) -->
+        <section class="screen flow" id="screen5" aria-label="Rotate">
+            <h1>Coba baca ini…</h1>
+            <p style="margin-top:14px">
+                <span class="rotated">sayanggg🥰🥰 sayanggg gimana kabarnya sayangggg🤔🥰🥰<br> aa harap baik selalu yah
+                    sayangggg🥰🥰<br> aa tau bangettt gimana neng🥰🥰 <br>neng tuh kuat🥰🥰 neng tuh hebat🥰🥰 aa sama
+                    sekali ngga pernah nganggep neng lemah kok sayangggg🥰🥰 <br> tapi kayaknya sekarng neng lagi cape
+                    yah sayangggg🤔🥰🥰 ngga papa kok sayangggg🥰🥰 ngga harus selalu kuat terus🥰🥰 sesekali
+                    istirahat🥰 sesekali egois ngga papa kok sayangggg🥰🥰<br>neng boleh jadi kuat dimanapun
+                    sayangggg🥰🥰 tapiiii jangan ragu buat ekpresiin diri neng ke aa yah sayangggg🥰🥰 <br><br><br>AA
+                    sayanggg bangettt sama neng🥰🥰🥰 jujur aa khawatir sama neng sayangggg🥰🥰 <br> aa pengen banget
+                    bisa berguna😭😭 aa pengen bangettt ngehibur neng😟😟 tapi aa bingunggg gimana caranya😭😭 <br>
+                    intinya kalo ada apa apa kasih tau yahhh sayangggg🥰🥰 <br>aa berharap bangettt neng cerita sama aa
+                    sayangggg🥰🥰</span>
+            </p>
+            <br><br><br>
+            <p class="instruction">Sudah kebaca? Sekarang <b>scroll terus ke bawah</b> ya ↓↓↓</p>
+        </section>
     </div>
-  </section>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      /* ===== HEART CONFETTI STREAM (bawaan) ===== */
-      function spawnHeart(){
-        const span=document.createElement('span');
-        span.className='confetti-heart';
-        span.textContent='❤';
-        const left=Math.random()*100;
-        const duration=4+Math.random()*4;
-        const size=12+Math.random()*22;
-        const driftStart=(Math.random()*40-20)+'vw';
-        const driftEnd=(Math.random()*60-30)+'vw';
-        span.style.left=left+'vw';
-        span.style.top='-5vh';
-        span.style.fontSize=size+'px';
-        span.style.setProperty('--sx',driftStart);
-        span.style.setProperty('--ex',driftEnd);
-        span.style.animationDuration=duration+'s';
-        document.body.appendChild(span);
-        setTimeout(()=>span.remove(),duration*1000);
-      }
-      setInterval(()=>{const n=2+Math.floor(Math.random()*3);for(let i=0;i<n;i++)setTimeout(spawnHeart,i*120);},1200);
+    <!-- ====== Scroll Stage: BR-only long path + Next gate ====== -->
+    <main class="scroll-stage" id="scrollStage" aria-label="Perjalanan Scroll">
+        <br>scroll kebawah
+        sayanggg🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>terus
+        sayanggg🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>semangatttt🥰🥰<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>sedikit
+        lagi
+        ayokkkk🤣🤣🤣<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>semangat
+        sayanggg
+        semangatttt🥰🥰<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        <section class="next-gate" id="nextGate" style="display:none">
+            <h1>Terakhir, pecahin hati ini untuk lanjut ke berikut nya yahhh sayangggg🤔🥰💥</h1>
+            <p>Tap tap yang cepet sayanggg sampai “POP!” — kalau pelan dia mengecil lagi 🙊🤣🤣</p>
+            <div class="balloon-wrap">
+                <div class="balloon" id="balloon"><span>❤️</span></div>
+            </div>
+            <p class="instruction">Kalau berhasil pecah bakal lanjut ke bagian akhir🥰🥰</p>
+        </section>
+    </main>
 
-      /* ===== STATE ===== */
-      let currentScreen=1, tapCount=0, startX=0;
+    <!-- ====== Screen 6: Ujian Kecil ====== -->
+    <section class="screen exam" id="screen6" aria-label="Ujian Kecil">
+        <div class="exam-wrap">
+            <h1>Kejutan buat neng🥰🥰</h1>
+            <p>Tekan <b>kedua hati</b> ini bersamaan selama ±1.5 detik. Kalau salah satu lepas <i>nggak akan muncul</i>
+                😝</p>
 
-      const words=[
-        "Hmmm sayangggg🥰🥰","Sayanggg kenapaaa🤔🥰🥰","kayaknya akhir akhir ini lagi kurang semangat yahhh sayanggg🥰🥰",
-        "Sinihhh cerita sama aa sayanggg🥰🥰","kan ada aa sayanggg😭😭🥰🥰","Jangan sungkan-sungkan yahhhh cantikkkk🥰🥰",
-        "Jangan sungkan buat bersandar ke aa🥰🥰","Jangan sungkan buat cari aa🥰🥰","Jangan sungkan buat butuh aa🥰🥰",
-        "AA ngga maksa kok sayangg🤔🥰🥰 Senyamannya neng aja yahhh sayanggg🥰🥰","Intinya neng ngga sendiri yahhh sayanggg🥰🥰",
-        "Masih ada aa kok sayanggg🥰🥰","Semangat yahhh cantikkkk🥰🥰","Semangat sayanggg semangatttt🥰🥰",
-        "Mana nihhh hyper nya🤭🫣🫣 katanya mau nambah sexyyyy🥰🥰🤣🤣","Dan yang paling pentinggg......","AA sayanggg bangettt sama neng🥰🥰🥰"
-      ];
+            <div class="thumb-gate">
+                <button class="heart-btn" id="leftThumb" aria-label="Jempol kiri">
+                    <svg class="icon-heart" viewBox="0 0 24 24" fill="none">
+                        <path class="fill"
+                            d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z" />
+                        <path class="stroke"
+                            d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z" />
+                    </svg>
+                </button>
+                <button class="heart-btn" id="rightThumb" aria-label="Jempol kanan">
+                    <svg class="icon-heart" viewBox="0 0 24 24" fill="none">
+                        <path class="fill"
+                            d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z" />
+                        <path class="stroke"
+                            d="M12 21s-6.716-4.29-9.193-7.254C.77 11.458.998 8.39 3.05 6.697c1.89-1.564 4.73-1.2 6.3.694L12 10l2.65-2.61c1.57-1.895 4.41-2.258 6.3-.694 2.05 1.692 2.28 4.76.243 7.05C18.716 16.71 12 21 12 21z" />
+                    </svg>
+                </button>
+            </div>
 
-      const screens=[...document.querySelectorAll('.screen')];
-      const stack=document.getElementById('stack');
-      const scrollStage=document.getElementById('scrollStage');
-      const longScroll=document.getElementById('longScroll');
-      const nextGate=document.getElementById('nextGate');
+            <div class="photo-reveal" id="photoReveal">
+                <img src="photo/IMG-20250727-WA0003.jpg" alt="Foto kita berdua" />
+                <div class="note">Cium dulu dong aa nya sayanggg😘🤣🤣</div>
+            </div>
+            <p class="instruction">Kalau udah muncul berarti udah selesai sayangggg🤔🥰🥰</p>
+        </div>
+    </section>
 
-      showScreen(1);
-      setupSwipe();
-      setupTap();
-
-      function buildLongBR(){
-        if(!longScroll) return;                 // kamu pakai <br> manual di <main>
-        if(longScroll.childElementCount) return;
-        const TARGET=20*window.innerHeight;
-        const perBR=28;
-        const count=Math.ceil((TARGET*1.15)/perBR)+120;
-        const checkpoints=new Set([50,300,800,1200,Math.floor(count*0.8)]);
-        for(let i=0;i<count;i++){
-          if(checkpoints.has(i)){
-            const p=document.createElement('p'); p.textContent="Scroll terus ya… bentar lagi! 💪";
-            longScroll.appendChild(p);
-          }
-          longScroll.appendChild(document.createElement('br'));
-        }
-      }
-
-      /* ===== NAV BETWEEN SCREENS ===== */
-      function showScreen(n){
-        screens.forEach(s=>s.classList.remove('active'));
-        const el=document.getElementById('screen'+n);
-        if(el){el.classList.add('active'); currentScreen=n;}
-        if(n===2) startWordAnimation();
-        if(n===5){
-          if(scrollStage) scrollStage.classList.add('ready');
-          document.body.style.overflowY='auto';
-          if(typeof longScroll!=='undefined' && longScroll){ buildLongBR(); }
-          startScrollGateForNext();
-        }
-      }
-
-      /* ===== WORDS MOVIE ===== */
-      function startWordAnimation(){
-        const box=document.getElementById('word-container');
-        box.innerHTML=''; let i=0;
-        const tick=()=>{ if(i<words.length){
-          const d=document.createElement('div'); d.className='word-animation'; d.textContent=words[i];
-          box.appendChild(d); setTimeout(()=>{ d.remove(); i++; tick(); },2800);
-        } else { setTimeout(()=>showScreen(3),700); } };
-        tick();
-      }
-
-      /* ===== SWIPE ===== */
-      function setupSwipe(){
-        let swiping=false;
-        document.body.addEventListener('touchstart',(e)=>{ startX=e.touches[0].clientX; swiping=true; },{passive:true});
-        document.body.addEventListener('touchmove',(e)=>{
-          if(!swiping) return;
-          const diffX=e.touches[0].clientX - startX;
-          if(diffX < -60 && currentScreen===1){ swiping=false; showScreen(2); }
-          if(diffX > 60  && currentScreen===4){ swiping=false; showScreen(5); }
-        },{passive:true});
-        document.body.addEventListener('touchend',()=> swiping=false);
-      }
-
-      /* ===== TAP 20x ===== */
-      function setupTap(){
-        const tapArea=document.getElementById('tap-area');
-        const tapCounter=document.getElementById('tap-counter');
-        if(!tapArea) return;
-        tapArea.addEventListener('click',function(){
-          if(currentScreen!==3) return;
-          tapCount++; tapCounter.textContent=tapCount;
-          this.style.transform='scale(.96)'; setTimeout(()=> this.style.transform='scale(1)',110);
-          if(tapCount>=20){ tapCount=0; setTimeout(()=> showScreen(4),260); }
-        });
-      }
-
-      /* ===== SCROLL GATE → show Next (balloon heart) ===== */
-      function startScrollGateForNext(){
-        const TARGET=20*window.innerHeight;
-        const progressBar=document.getElementById('progress');
-        let base=window.scrollY, opened=false;
-
-        const atBottom=()=>{
-          const sh=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
-          return (window.scrollY + window.innerHeight + 2) >= sh;
-        };
-
-        function updateProgress(dist){
-          const docH=Math.max(document.body.scrollHeight,document.documentElement.scrollHeight);
-          const docProgress=((window.scrollY)/(docH - window.innerHeight)) || 0;
-          const relProgress=Math.min(1, dist/TARGET);
-          const finalProgress=Math.max(relProgress, docProgress);
-          const pct=Math.floor(finalProgress*100);
-          if(progressBar) progressBar.style.width=pct+'%';
-
-          if(!opened && (finalProgress>=1 || atBottom())){
-            opened=true; if(progressBar) progressBar.style.width='100%';
-            nextGate.style.display='block'; initBalloonGate();
-          }
-        }
-
-        function onScroll(){ if(opened) return; const dist=Math.max(0, window.scrollY - base); updateProgress(dist); }
-        updateProgress(0);
-        window.addEventListener('scroll', onScroll, {passive:true});
-      }
-
-      /* ===== BALLOON HEART: tap cepat untuk POP ===== */
-      function initBalloonGate(){
-        const balloon=document.getElementById('balloon');
-        let scale=1.0; const MAX=3.2; const TAP_INC=0.14; const DECAY=0.045; const INTERVAL=180;
-        let decayTimer=null; balloon.style.transform=`scale(${scale})`;
-
-        const decay=()=>{ scale=Math.max(1, scale-DECAY); balloon.style.transform=`scale(${scale})`;
-          if(scale<=1.02) balloon.style.borderColor='rgba(255,255,255,.9)'; };
-        decayTimer=setInterval(decay, INTERVAL);
-
-        function tap(){
-          scale=Math.min(MAX+0.4, scale+TAP_INC);
-          balloon.style.transform=`scale(${scale})`;
-          balloon.style.borderColor='#fff'; balloon.style.background='rgba(255,255,255,.22)';
-          if(scale>=MAX){
-            clearInterval(decayTimer); balloon.classList.add('pop');
-            burstHearts(20);
-            setTimeout(()=>{
-              const exam=document.getElementById('screen6');
-              stack.style.display='none';
-              exam.style.display='block'; exam.classList.add('active');
-              document.body.style.overflowY='auto';
-              exam.scrollIntoView({behavior:'smooth',block:'start'});
-              initTwoThumbGate();
-            },420);
-          }
-        }
-        balloon.addEventListener('click', tap);
-        balloon.addEventListener('touchstart', (e)=>{ e.preventDefault(); tap(); }, {passive:false});
-      }
-
-      function burstHearts(n=14){ for(let i=0;i<n;i++) setTimeout(spawnHeart, i*60); }
-
-      /* ===== TWO-THUMB GATE (screen6) ===== */
-      function initTwoThumbGate(){
-        const left=document.getElementById('leftThumb');
-        const right=document.getElementById('rightThumb');
-        const reveal=document.getElementById('photoReveal');
-        if(!left || !right || !reveal) return;
-
-        let leftDown=false, rightDown=false, timer=null;
-        const HOLD_MS=1500, windowMs=800; let syncTimer=null;
-
-        // Foto tetap tampil setelah pertama unlock
-        let unlocked = reveal.style.display === 'block';
-
-        function resetHold(){
-          clearTimeout(timer); timer=null;
-          leftDown=false; rightDown=false;
-          left.classList.remove('active'); right.classList.remove('active');
-          if(!unlocked){ reveal.style.display='none'; }
-        }
-        function finishUnlock(){
-          reveal.style.display='block';
-          unlocked=true;
-          left.classList.remove('active'); right.classList.remove('active');
-        }
-        function tryStartHold(){
-          if(unlocked) return;
-          if(leftDown && rightDown && !timer){
-            timer=setTimeout(()=>{ finishUnlock(); }, HOLD_MS);
-          }
-        }
-        function scheduleSyncWindow(){
-          if(unlocked) return;
-          clearTimeout(syncTimer);
-          syncTimer=setTimeout(()=>{
-            if((leftDown && !rightDown) || (!leftDown && rightDown)) resetHold();
-          }, windowMs);
-        }
-        const setActive=(btn,on)=> btn.classList.toggle('active', on);
-
-        ['pointerdown','pointerup','pointercancel','pointerleave'].forEach(evt=>{
-          left.addEventListener(evt,(e)=>{
-            if(evt==='pointerdown'){
-              e.preventDefault(); leftDown=true; left.setPointerCapture?.(e.pointerId);
-              setActive(left,true); scheduleSyncWindow(); tryStartHold();
-            }else{
-              left.releasePointerCapture?.(e.pointerId);
-              leftDown=false; setActive(left,false);
-              if(timer && !unlocked){ resetHold(); }
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* ===== HEART CONFETTI STREAM (bawaan) ===== */
+            function spawnHeart() {
+                const span = document.createElement('span');
+                span.className = 'confetti-heart';
+                span.textContent = '❤';
+                const left = Math.random() * 100;
+                const duration = 4 + Math.random() * 4;
+                const size = 12 + Math.random() * 22;
+                const driftStart = (Math.random() * 40 - 20) + 'vw';
+                const driftEnd = (Math.random() * 60 - 30) + 'vw';
+                span.style.left = left + 'vw';
+                span.style.top = '-5vh';
+                span.style.fontSize = size + 'px';
+                span.style.setProperty('--sx', driftStart);
+                span.style.setProperty('--ex', driftEnd);
+                span.style.animationDuration = duration + 's';
+                document.body.appendChild(span);
+                setTimeout(() => span.remove(), duration * 1000);
             }
-          }, {passive:false});
-          right.addEventListener(evt,(e)=>{
-            if(evt==='pointerdown'){
-              e.preventDefault(); rightDown=true; right.setPointerCapture?.(e.pointerId);
-              setActive(right,true); scheduleSyncWindow(); tryStartHold();
-            }else{
-              right.releasePointerCapture?.(e.pointerId);
-              rightDown=false; setActive(right,false);
-              if(timer && !unlocked){ resetHold(); }
+            setInterval(() => { const n = 2 + Math.floor(Math.random() * 3); for (let i = 0; i < n; i++)setTimeout(spawnHeart, i * 120); }, 1200);
+
+            /* ===== STATE ===== */
+            let currentScreen = 1, tapCount = 0, startX = 0;
+
+            const words = [
+                "Hmmm sayangggg🥰🥰", "Sayanggg kenapaaa🤔🥰🥰", "kayaknya akhir akhir ini lagi kurang semangat yahhh sayanggg🥰🥰",
+                "Sinihhh cerita sama aa sayanggg🥰🥰", "kan ada aa sayanggg😭😭🥰🥰", "Jangan sungkan-sungkan yahhhh cantikkkk🥰🥰",
+                "Jangan sungkan buat bersandar ke aa🥰🥰", "Jangan sungkan buat cari aa🥰🥰", "Jangan sungkan buat butuh aa🥰🥰",
+                "AA ngga maksa kok sayangg🤔🥰🥰 Senyamannya neng aja yahhh sayanggg🥰🥰", "Intinya neng ngga sendiri yahhh sayanggg🥰🥰",
+                "Masih ada aa kok sayanggg🥰🥰", "Semangat yahhh cantikkkk🥰🥰", "Semangat sayanggg semangatttt🥰🥰",
+                "Mana nihhh hyper nya🤭🫣🫣 katanya mau nambah sexyyyy🥰🥰🤣🤣", "Dan yang paling pentinggg......", "AA sayanggg bangettt sama neng🥰🥰🥰"
+            ];
+
+            const screens = [...document.querySelectorAll('.screen')];
+            const stack = document.getElementById('stack');
+            const scrollStage = document.getElementById('scrollStage');
+            const longScroll = document.getElementById('longScroll');
+            const nextGate = document.getElementById('nextGate');
+
+            showScreen(1);
+            setupSwipe();
+            setupTap();
+
+            function buildLongBR() {
+                if (!longScroll) return;                 // kamu pakai <br> manual di <main>
+                if (longScroll.childElementCount) return;
+                const TARGET = 20 * window.innerHeight;
+                const perBR = 28;
+                const count = Math.ceil((TARGET * 1.15) / perBR) + 120;
+                const checkpoints = new Set([50, 300, 800, 1200, Math.floor(count * 0.8)]);
+                for (let i = 0; i < count; i++) {
+                    if (checkpoints.has(i)) {
+                        const p = document.createElement('p'); p.textContent = "Scroll terus ya… bentar lagi! 💪";
+                        longScroll.appendChild(p);
+                    }
+                    longScroll.appendChild(document.createElement('br'));
+                }
             }
-          }, {passive:false});
+
+            /* ===== NAV BETWEEN SCREENS ===== */
+            function showScreen(n) {
+                screens.forEach(s => s.classList.remove('active'));
+                const el = document.getElementById('screen' + n);
+                if (el) { el.classList.add('active'); currentScreen = n; }
+                if (n === 2) startWordAnimation();
+                if (n === 5) {
+                    if (scrollStage) scrollStage.classList.add('ready');
+                    document.body.style.overflowY = 'auto';
+                    if (typeof longScroll !== 'undefined' && longScroll) { buildLongBR(); }
+                    startScrollGateForNext();
+                }
+            }
+
+            /* ===== WORDS MOVIE ===== */
+            function startWordAnimation() {
+                const box = document.getElementById('word-container');
+                box.innerHTML = ''; let i = 0;
+                const tick = () => {
+                    if (i < words.length) {
+                        const d = document.createElement('div'); d.className = 'word-animation'; d.textContent = words[i];
+                        box.appendChild(d); setTimeout(() => { d.remove(); i++; tick(); }, 2800);
+                    } else { setTimeout(() => showScreen(3), 700); }
+                };
+                tick();
+            }
+
+            /* ===== SWIPE ===== */
+            function setupSwipe() {
+                let swiping = false;
+                document.body.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; swiping = true; }, { passive: true });
+                document.body.addEventListener('touchmove', (e) => {
+                    if (!swiping) return;
+                    const diffX = e.touches[0].clientX - startX;
+                    if (diffX < -60 && currentScreen === 1) { swiping = false; showScreen(2); }
+                    if (diffX > 60 && currentScreen === 4) { swiping = false; showScreen(5); }
+                }, { passive: true });
+                document.body.addEventListener('touchend', () => swiping = false);
+            }
+
+            /* ===== TAP 20x ===== */
+            function setupTap() {
+                const tapArea = document.getElementById('tap-area');
+                const tapCounter = document.getElementById('tap-counter');
+                if (!tapArea) return;
+                tapArea.addEventListener('click', function () {
+                    if (currentScreen !== 3) return;
+                    tapCount++; tapCounter.textContent = tapCount;
+                    this.style.transform = 'scale(.96)'; setTimeout(() => this.style.transform = 'scale(1)', 110);
+                    if (tapCount >= 20) { tapCount = 0; setTimeout(() => showScreen(4), 260); }
+                });
+            }
+
+            /* ===== SCROLL GATE → show Next (balloon heart) ===== */
+            function startScrollGateForNext() {
+                const TARGET = 20 * window.innerHeight;
+                const progressBar = document.getElementById('progress');
+                let base = window.scrollY, opened = false;
+
+                const atBottom = () => {
+                    const sh = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+                    return (window.scrollY + window.innerHeight + 2) >= sh;
+                };
+
+                function updateProgress(dist) {
+                    const docH = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+                    const docProgress = ((window.scrollY) / (docH - window.innerHeight)) || 0;
+                    const relProgress = Math.min(1, dist / TARGET);
+                    const finalProgress = Math.max(relProgress, docProgress);
+                    const pct = Math.floor(finalProgress * 100);
+                    if (progressBar) progressBar.style.width = pct + '%';
+
+                    if (!opened && (finalProgress >= 1 || atBottom())) {
+                        opened = true; if (progressBar) progressBar.style.width = '100%';
+                        nextGate.style.display = 'block'; initBalloonGate();
+                    }
+                }
+
+                function onScroll() { if (opened) return; const dist = Math.max(0, window.scrollY - base); updateProgress(dist); }
+                updateProgress(0);
+                window.addEventListener('scroll', onScroll, { passive: true });
+            }
+
+            /* ===== BALLOON HEART: tap cepat untuk POP ===== */
+            function initBalloonGate() {
+                const balloon = document.getElementById('balloon');
+                let scale = 1.0; const MAX = 3.2; const TAP_INC = 0.14; const DECAY = 0.045; const INTERVAL = 180;
+                let decayTimer = null; balloon.style.transform = `scale(${scale})`;
+
+                const decay = () => {
+                    scale = Math.max(1, scale - DECAY); balloon.style.transform = `scale(${scale})`;
+                    if (scale <= 1.02) balloon.style.borderColor = 'rgba(255,255,255,.9)';
+                };
+                decayTimer = setInterval(decay, INTERVAL);
+
+                function tap() {
+                    scale = Math.min(MAX + 0.4, scale + TAP_INC);
+                    balloon.style.transform = `scale(${scale})`;
+                    balloon.style.borderColor = '#fff'; balloon.style.background = 'rgba(255,255,255,.22)';
+                    if (scale >= MAX) {
+                        clearInterval(decayTimer); balloon.classList.add('pop');
+                        burstHearts(20);
+                        setTimeout(() => {
+                            const exam = document.getElementById('screen6');
+                            stack.style.display = 'none';
+                            exam.style.display = 'block'; exam.classList.add('active');
+                            document.body.style.overflowY = 'auto';
+                            exam.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            initTwoThumbGate();
+                        }, 420);
+                    }
+                }
+                balloon.addEventListener('click', tap);
+                balloon.addEventListener('touchstart', (e) => { e.preventDefault(); tap(); }, { passive: false });
+            }
+
+            function burstHearts(n = 14) { for (let i = 0; i < n; i++) setTimeout(spawnHeart, i * 60); }
+
+            /* ===== TWO-THUMB GATE (screen6) ===== */
+            function initTwoThumbGate() {
+                const left = document.getElementById('leftThumb');
+                const right = document.getElementById('rightThumb');
+                const reveal = document.getElementById('photoReveal');
+                if (!left || !right || !reveal) return;
+
+                let leftDown = false, rightDown = false, timer = null;
+                const HOLD_MS = 1500, windowMs = 800; let syncTimer = null;
+
+                // Foto tetap tampil setelah pertama unlock
+                let unlocked = reveal.style.display === 'block';
+
+                function resetHold() {
+                    clearTimeout(timer); timer = null;
+                    leftDown = false; rightDown = false;
+                    left.classList.remove('active'); right.classList.remove('active');
+                    if (!unlocked) { reveal.style.display = 'none'; }
+                }
+                function finishUnlock() {
+                    reveal.style.display = 'block';
+                    unlocked = true;
+                    left.classList.remove('active'); right.classList.remove('active');
+                }
+                function tryStartHold() {
+                    if (unlocked) return;
+                    if (leftDown && rightDown && !timer) {
+                        timer = setTimeout(() => { finishUnlock(); }, HOLD_MS);
+                    }
+                }
+                function scheduleSyncWindow() {
+                    if (unlocked) return;
+                    clearTimeout(syncTimer);
+                    syncTimer = setTimeout(() => {
+                        if ((leftDown && !rightDown) || (!leftDown && rightDown)) resetHold();
+                    }, windowMs);
+                }
+                const setActive = (btn, on) => btn.classList.toggle('active', on);
+
+                ['pointerdown', 'pointerup', 'pointercancel', 'pointerleave'].forEach(evt => {
+                    left.addEventListener(evt, (e) => {
+                        if (evt === 'pointerdown') {
+                            e.preventDefault(); leftDown = true; left.setPointerCapture?.(e.pointerId);
+                            setActive(left, true); scheduleSyncWindow(); tryStartHold();
+                        } else {
+                            left.releasePointerCapture?.(e.pointerId);
+                            leftDown = false; setActive(left, false);
+                            if (timer && !unlocked) { resetHold(); }
+                        }
+                    }, { passive: false });
+                    right.addEventListener(evt, (e) => {
+                        if (evt === 'pointerdown') {
+                            e.preventDefault(); rightDown = true; right.setPointerCapture?.(e.pointerId);
+                            setActive(right, true); scheduleSyncWindow(); tryStartHold();
+                        } else {
+                            right.releasePointerCapture?.(e.pointerId);
+                            rightDown = false; setActive(right, false);
+                            if (timer && !unlocked) { resetHold(); }
+                        }
+                    }, { passive: false });
+                });
+            }
         });
-      }
-    });
-  </script>
+    </script>
 </body>
+
 </html>
